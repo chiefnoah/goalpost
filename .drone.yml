@@ -1,3 +1,4 @@
+---
 kind: pipeline
 name: default
 
@@ -7,3 +8,6 @@ steps:
     commands:
     - go build
     - go test
+---
+kind: signature
+hmac: 0efd75a6b15ed01260ac0da97d290d1a4ce83e1596ee0b268060e31ee7d90173
