@@ -7,7 +7,7 @@ steps:
     image: golang:1.13
     commands:
     - go build
-    - go test
+    - go test -coverprofile coverage.html
 ---
 kind: signature
-hmac: 0efd75a6b15ed01260ac0da97d290d1a4ce83e1596ee0b268060e31ee7d90173
+hmac: 5880c971790c34a340b073608c6ffed8cb14509779038b5807060c68abd76073
