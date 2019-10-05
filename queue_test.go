@@ -1,4 +1,4 @@
-package queue
+package goalpost
 
 import (
 	"context"
