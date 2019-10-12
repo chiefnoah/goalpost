@@ -1,18 +1,3 @@
-# goalpost
-
-[![Build Status](https://cloud.drone.io/api/badges/chiefnoah/goalpost/status.svg)](https://cloud.drone.io/chiefnoah/goalpost) [![](https://godoc.org/github.com/chiefnoah/goalpost?status.svg)](http://godoc.org/github.com/chiefnoah/goalpost)
-
-Goalpost is a durable, embedable, worker queue for Golang
-
-It makes use of boltdb/bbolt to provide durability so messages don't get lost when the process get's killed.
-
-
-
-## Quickstart
-
-Below is a simple use of goalpost:
-
-```golang
 package main
 
 import (
@@ -71,5 +56,3 @@ func main() {
 	//Remember to close your queue when you're done using it
 	q.Close()
 }
-```
-

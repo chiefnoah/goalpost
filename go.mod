@@ -1,4 +1,4 @@
-module git.packetlostandfound.us/chiefnoah/goalpost
+module github.com/chiefnoah/goalpost
 
 go 1.13
 
