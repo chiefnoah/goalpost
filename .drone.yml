@@ -10,4 +10,4 @@ steps:
     - go test -coverprofile coverage.html
 ---
 kind: signature
-hmac: 5880c971790c34a340b073608c6ffed8cb14509779038b5807060c68abd76073
+hmac: 2b96588d1d6799d937cf64ddce0d67b57d75b0d334cbe83df59b753574fcc990
