@@ -19,11 +19,19 @@ const (
 
 //Job wraps arbitrary data for processing
 type Job struct {
-	Status     JobStatus
-	ID         uint64
-	Data       []byte
+	Status JobStatus
+	//Unique identifier for a Job
+	ID uint64
+	//Data contains the bytes that were pushed using Queue.PushBytes()
+	Data []byte
+	//RetryCount is the number of times the job has been retried
+	//If your work can have a temporary failure state, it is recommended
+	//that you check retry count and return a fatal error after a certain
+	//number of retries
 	RetryCount int
-	Message    string
+	//Message is primarily used for debugging. It conatains status info
+	//about what was last done with the job.
+	Message string
 }
 
 //DecodeJob decodes a gob encoded byte array into a Job struct and returns a pointer to it
