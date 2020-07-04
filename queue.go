@@ -268,6 +268,22 @@ func (q *Queue) updateJobStatus(id uint64, status JobStatus, message string) err
 	return err
 }
 
+// CleanOldJobs loops through all jobs marked as completed or failed and deletes them from the database
+// Warning: this is destructive, that job data is definitely done if you call this function.
+func (q *Queue) CleanOldJobs() error {
+	return q.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(completedJobsBucketName))
+		c := b.Cursor()
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			if err := b.Delete(k); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+}
+
 //resumeUnackedJobs loops through all jobs in the main job bucket and sends
 //channel notifications if any are uacked or nacked
 func (q *Queue) resumeUnackedJobs() error {

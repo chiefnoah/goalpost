@@ -283,3 +283,43 @@ func TestResumeUackedJobs(t *testing.T) {
 	assert.NotNil(t, completedJob)
 	assert.Equal(t, Ack, completedJob.Status)
 }
+
+func TestCleanOldJobs(t *testing.T) {
+	os.Remove("test.db")
+	q, err := Init("test")
+	assert.Nil(t, err)
+	defer os.Remove("test.db")
+	defer q.Close()
+	t.Log("Adding test failed jobs")
+	// Set up some failed jobs
+	for _, v := range "abcdefghijklmnopqrstuvwxyz" {
+		j := &Job{
+			Status:     Failed,
+			Data:       []byte{byte(v)},
+			RetryCount: 0,
+		}
+		err := q.db.Update(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte(completedJobsBucketName))
+			jobID, _ := b.NextSequence()
+			j.ID = jobID
+			return b.Put(intToByteArray(jobID), j.Bytes())
+		})
+		assert.Nil(t, err)
+	}
+	t.Log("Checking number of failed jobs is 26")
+	// Check that jobs are actually there
+	q.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(completedJobsBucketName))
+		stats := b.Stats()
+		assert.Equal(t, stats.KeyN, 26)
+		return nil
+	})
+	q.CleanOldJobs()
+	t.Log("Checking all failed/completed jobs are deleted")
+	q.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(completedJobsBucketName))
+		stats := b.Stats()
+		assert.Equal(t, stats.KeyN, 0)
+		return nil
+	})
+}
