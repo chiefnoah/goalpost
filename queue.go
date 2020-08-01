@@ -7,9 +7,10 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"log"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	bolt "go.etcd.io/bbolt"
 )
