@@ -35,13 +35,12 @@ type Job struct {
 }
 
 //DecodeJob decodes a gob encoded byte array into a Job struct and returns a pointer to it
-func DecodeJob(b []byte) *Job {
-	//TODO: this should return an error in the event decoder.Decode returns an err
+func DecodeJob(b []byte) (*Job, error) {
 	buffer := bytes.NewReader(b)
 	decoder := gob.NewDecoder(buffer)
 	job := Job{}
-	decoder.Decode(&job)
-	return &job
+	err := decoder.Decode(&job)
+	return &job, err
 }
 
 //Bytes returns a gob encoded byte array representation of *j
