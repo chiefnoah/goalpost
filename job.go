@@ -29,7 +29,7 @@ type Job struct {
 	//that you check retry count and return a fatal error after a certain
 	//number of retries
 	RetryCount int
-	//Message is primarily used for debugging. It conatains status info
+	//Message is primarily used for debugging. It contains status info
 	//about what was last done with the job.
 	Message string
 }
@@ -50,6 +50,22 @@ func (j *Job) Bytes() []byte {
 	encoder := gob.NewEncoder(buffer)
 	encoder.Encode(j)
 	return buffer.Bytes()
+}
+
+// State returns the job status in human readable form
+func (j *Job) State() string {
+	switch j.Status {
+	case Ack:
+		return "completed"
+	case Uack:
+		return "pending"
+	case Nack:
+		return "retrying"
+	case Failed:
+		return "failed"
+	default:
+		return "unknown"
+	}
 }
 
 //RecoverableWorkerError defines an error that a worker DoWork func
