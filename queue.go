@@ -240,7 +240,7 @@ func (q *Queue) updateJobStatus(id uint64, status JobStatus, message string) err
 				// Don't return this, it's non-fatal
 			}
 			// remove the job from the 'active' bucket
-			if err = jobsBucket.Delete(intToByteArray(id)); err != nil {
+			if err := jobsBucket.Delete(intToByteArray(id)); err != nil {
 				log.Printf("Unable to remove job from activie jobs bucket: %s", err)
 			}
 		} else if status == Nack {
