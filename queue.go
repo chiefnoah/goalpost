@@ -75,8 +75,7 @@ func Init(filepath string) (*Queue, error) {
 	var wg sync.WaitGroup
 	q.wg = &wg
 	//resume stopped jobs
-	err = q.resumeUnackedJobs()
-	if err != nil {
+	if err = q.resumeUnackedJobs(); err != nil {
 		log.Printf("Unable to resume jobs from bucket: %s", err)
 		//Don't fail out, this isn't really fatal. But maybe it should be?
 	}
@@ -113,8 +112,7 @@ func (q *Queue) registerWorkerWithContext(ctx context.Context, w Worker) {
 				return
 			case jobID = <-q.notifier:
 				log.Printf("Receive job ID %d", jobID)
-				err := q.updateJobStatus(jobID, Uack, fmt.Sprintf("Picked up by %s", w.ID()))
-				if err != nil {
+				if err := q.updateJobStatus(jobID, Uack, fmt.Sprintf("Picked up by %s", w.ID())); err != nil {
 					log.Printf("Unable to update job status: %s", err)
 					continue
 				}
@@ -178,8 +176,7 @@ func (q *Queue) PushJob(j *Job) (uint64, error) {
 		jobID, _ = b.NextSequence()
 		j.ID = jobID
 		log.Printf("Storing job %d for processing", jobID)
-		err := b.Put(intToByteArray(jobID), j.Bytes())
-		return err
+		return b.Put(intToByteArray(jobID), j.Bytes())
 	})
 	if err != nil {
 		log.Printf("Unable to push job to queue: %s", err)
@@ -233,28 +230,28 @@ func (q *Queue) updateJobStatus(id uint64, status JobStatus, message string) err
 		job.Message = message
 		// Move the job to the "completed" bucket if it's failed or Acked
 		if status == Ack || status == Failed {
-			log.Printf("Job is complete or failed. Moving to completed jobs bucket")
-			err := completedJobsBucket.Put(intToByteArray(id), job.Bytes())
-			if err != nil {
+			s := "failed"
+			if status == Ack {
+				s = "complete"
+			}
+			log.Printf("Job is %s. Moving to completed jobs bucket", s)
+			if err := completedJobsBucket.Put(intToByteArray(id), job.Bytes()); err != nil {
 				log.Printf("Unable to add job %d to completedJobsBucket: ", err)
 				// Don't return this, it's non-fatal
 			}
 			// remove the job from the 'active' bucket
-			err = jobsBucket.Delete(intToByteArray(id))
-			if err != nil {
+			if err = jobsBucket.Delete(intToByteArray(id)); err != nil {
 				log.Printf("Unable to remove job from activie jobs bucket: %s", err)
 			}
 		} else if status == Nack {
 			job.RetryCount = job.RetryCount + 1
 			log.Printf("Nack: retry count: %d", job.RetryCount)
-			err := jobsBucket.Put(intToByteArray(id), job.Bytes())
-			if err != nil {
+			if err := jobsBucket.Put(intToByteArray(id), job.Bytes()); err != nil {
 				log.Printf("Unable to update job in active jobs bucket: %s", err)
 				return err
 			}
 		} else {
-			err := jobsBucket.Put(intToByteArray(id), job.Bytes())
-			if err != nil {
+			if err := jobsBucket.Put(intToByteArray(id), job.Bytes()); err != nil {
 				log.Printf("Unable to update job in active jobs bucket: %s", err)
 				return err
 			}
