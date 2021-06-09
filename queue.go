@@ -213,8 +213,8 @@ func (q *Queue) getJobInBucketByID(id uint64, bucketName string) (*Job, error) {
 			log.Printf("Unknown key: %d", id)
 			return nil
 		}
-		job, err = DecodeJob(jobBytes)
-		return err
+		job = DecodeJob(jobBytes)
+		return nil
 	})
 	return job, err
 }
